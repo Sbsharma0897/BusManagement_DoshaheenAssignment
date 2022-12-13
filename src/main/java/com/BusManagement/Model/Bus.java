@@ -1,5 +1,7 @@
 package com.BusManagement.Model;
 
+import java.time.Year;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -8,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Pattern;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +30,7 @@ public class Bus {
     
 	@Column(unique = true)
 	private String busNumber;
-	private String manufactuerYear;
+	private Year manufactuerYear;
 	private String  manufacturer;
 	private Integer seatCapacity;
 	private Integer numberOfAxle; 

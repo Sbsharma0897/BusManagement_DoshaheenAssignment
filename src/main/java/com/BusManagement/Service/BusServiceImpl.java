@@ -1,5 +1,7 @@
 package com.BusManagement.Service;
 
+import java.time.Year;
+import com.BusManagement.Exception.YearException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.BusManagement.Exception.BusException;
+import com.BusManagement.Exception.DuplicateBusNumberException;
 import com.BusManagement.Model.Bus;
 import com.BusManagement.Payloads.BusDto;
 import com.BusManagement.Repo.BusRepo;
@@ -69,10 +72,25 @@ public class BusServiceImpl implements BusService{
 //		{
 //			throw new BusException("A bus with number plate of "+busNumber+" already exists in the database");
 //		}
+		Year currentYear=Year.now();
+		Year beginYear=Year.of(1900);
+		Year manfactureYear=busDto.getManufactuerYear();
+		String yearString=manfactureYear.toString();
 		
+		
+		if(yearString.length()!=4 || manfactureYear.isBefore(beginYear) || currentYear.isBefore(manfactureYear))
+		{
+			throw new YearException("Manufacture Year not valid");
+		}
+//		
 		Bus bus=modelMapper.map(busDto, Bus.class);
+		Bus savedBus=null;
+		try {
+			 savedBus=busRepo.save(bus);
+		} catch (Exception e) {
+			throw new DuplicateBusNumberException("A bus with the number "+busDto.getBusNumber()+" already exists");
+		}
 		
-		Bus savedBus=busRepo.save(bus);
 		
 		return modelMapper.map(savedBus,BusDto.class);
 		

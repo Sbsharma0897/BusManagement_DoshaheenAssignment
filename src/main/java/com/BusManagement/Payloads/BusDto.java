@@ -1,5 +1,7 @@
 package com.BusManagement.Payloads;
 
+import java.time.Year;
+
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -7,6 +9,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import org.springframework.data.annotation.CreatedDate;
 
 import com.BusManagement.Model.DecisionEnum;
 
@@ -19,21 +29,33 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BusDto {
 	
-	
+	@Pattern(regexp ="[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}", message = "Invalid Bus Number")
 	private String busNumber;
 	
-	private String manufactuerYear;
+	@NotNull(message = "Year must not be null")
+	private Year manufactuerYear;
+	@NotNull @NotEmpty 
 	private String  manufacturer;
+	@Min(value = 1, message="Seat Number not valid")
+	@Max(value = 1000,message = "Seat Number not valid")
 	private Integer seatCapacity;
+	@Min(value = 2, message="Number of Axle below the defined limit")
+	@Max(value = 14, message="Number of Axle above the defined limit")
 	private Integer numberOfAxle;
 	@Enumerated(EnumType.ORDINAL)
+	@NotNull 
 	private DecisionEnum  AC;
+	@NotNull @NotBlank
 	private String  travelAgency;
 	@Enumerated(EnumType.ORDINAL)
+	@NotNull 
 	private DecisionEnum sleeper;
 	@Enumerated(EnumType.ORDINAL)
+	@NotNull 
 	private DecisionEnum wifi;
 	@Enumerated(EnumType.ORDINAL)
+	@NotNull 
 	private DecisionEnum tvPerSeat;
+	
 
 }
