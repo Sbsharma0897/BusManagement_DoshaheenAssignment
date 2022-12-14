@@ -2,6 +2,8 @@ package com.BusManagement.Service;
 
 import java.time.Year;
 import com.BusManagement.Exception.YearException;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,7 +15,10 @@ import org.springframework.stereotype.Service;
 import com.BusManagement.Exception.BusException;
 import com.BusManagement.Exception.DuplicateBusNumberException;
 import com.BusManagement.Model.Bus;
+import com.BusManagement.Model.Seat;
+import com.BusManagement.Model.SeatTypeEnum;
 import com.BusManagement.Payloads.BusDto;
+import com.BusManagement.Payloads.BusSeatsDto;
 import com.BusManagement.Repo.BusRepo;
 
 @Service
@@ -74,26 +79,56 @@ public class BusServiceImpl implements BusService{
 //		}
 		Year currentYear=Year.now();
 		Year beginYear=Year.of(1900);
-		Year manfactureYear=busDto.getManufactuerYear();
-		String yearString=manfactureYear.toString();
+		String yearString=busDto.getManufactuerYear();
+		Year manfactureYear=Year.of(Integer.parseInt(yearString));
+		System.out.println(manfactureYear);
 		
 		
 		if(yearString.length()!=4 || manfactureYear.isBefore(beginYear) || currentYear.isBefore(manfactureYear))
 		{
 			throw new YearException("Manufacture Year not valid");
 		}
-//		
+		System.out.println("step 1");
+		
 		Bus bus=modelMapper.map(busDto, Bus.class);
+		
+		addingSeats(bus);
+		System.out.println("step 2");
 		Bus savedBus=null;
 		try {
 			 savedBus=busRepo.save(bus);
 		} catch (Exception e) {
 			throw new DuplicateBusNumberException("A bus with the number "+busDto.getBusNumber()+" already exists");
 		}
+		System.out.println("step 3");
+		
 		
 		
 		return modelMapper.map(savedBus,BusDto.class);
 		
+		
+	}
+	
+	public void addingSeats(Bus bus)
+	{
+		int seats=bus.getSeatCapacity();
+		int seatsPerRow=bus.getSeatsPerRow();
+		
+		List<Seat> list=new ArrayList<>();
+		
+		for(int i=1;i<=seats;i++)
+		{
+			
+	      Seat seat=new Seat();
+		  seat.setSeatNumber("L"+i);
+		  seat.setSeatType(SeatTypeEnum.SLEEPER);
+		  seat.setBus(bus);
+		  seat.setSeatBooked(false);
+		  list.add(seat);
+				
+			
+		}
+		bus.setSeats(list);
 		
 	}
 
@@ -111,6 +146,25 @@ public class BusServiceImpl implements BusService{
 		
 		return modelMapper.map(bus,BusDto.class);
 		
+	}
+
+	@Override
+	public BusSeatsDto fetchSingleBusDetailsWithSeats(String busNumber) {
+        
+		Optional<Bus> optional=busRepo.findByBusNumber(busNumber);
+		
+		if(!optional.isPresent())
+		{
+			throw new BusException("Bus with number "+busNumber+" not found in the datatbase");
+		}
+		System.out.println("sss");
+		Bus bus=optional.get();
+		
+		BusSeatsDto busDto=modelMapper.map(bus, BusSeatsDto.class);
+		
+		System.out.println("bbb");
+		
+		return busDto;
 	}
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.BusManagement.Payloads.BusDto;
+import com.BusManagement.Payloads.BusSeatsDto;
 import com.BusManagement.Service.BusService;
 
 @RestController
@@ -32,6 +33,15 @@ public class BusController {
 		
 		
 		return new ResponseEntity<BusDto>(busDto,HttpStatus.OK);
+	}
+	
+	@GetMapping("allDetails/{busNumber}")
+	private ResponseEntity<BusSeatsDto> fetchSingleBusDetailsWithSeats(@Valid @PathVariable String busNumber)
+	{
+		BusSeatsDto busDto=busService.fetchSingleBusDetailsWithSeats(busNumber);
+		
+		
+		return new ResponseEntity<BusSeatsDto>(busDto,HttpStatus.OK);
 	}
 	
 	@GetMapping("/all")
