@@ -27,7 +27,7 @@ public class Seat {
 	private SeatTypeEnum seatType;
 	private boolean seatBooked;
 	
-	@ManyToOne()
+	@ManyToOne
 	private Bus bus;
 	
 	
